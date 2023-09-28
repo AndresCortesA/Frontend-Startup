@@ -1,194 +1,176 @@
 "use strict";
 
-var ctx = document.getElementById("myChart").getContext('2d');
-var myChart = new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: ["January", "February", "March", "April", "May", "June", "July", "August"],
-    datasets: [{
-      label: 'Sales',
-      data: [3200, 1800, 4305, 3022, 6310, 5120, 5880, 6154],
-      borderWidth: 2,
-      backgroundColor: 'rgba(63,82,227,.8)',
-      borderWidth: 0,
-      borderColor: 'transparent',
-      pointBorderWidth: 0,
-      pointRadius: 3.5,
-      pointBackgroundColor: 'transparent',
-      pointHoverBackgroundColor: 'rgba(63,82,227,.8)',
-    },
-    {
-      label: 'Budget',
-      data: [2207, 3403, 2200, 5025, 2302, 4208, 3880, 4880],
-      borderWidth: 2,
-      backgroundColor: 'rgba(254,86,83,.7)',
-      borderWidth: 0,
-      borderColor: 'transparent',
-      pointBorderWidth: 0 ,
-      pointRadius: 3.5,
-      pointBackgroundColor: 'transparent',
-      pointHoverBackgroundColor: 'rgba(254,86,83,.8)',
-    }]
-  },
-  options: {
-    legend: {
-      display: false
-    },
-    scales: {
-      yAxes: [{
-        gridLines: {
-          // display: false,
-          drawBorder: false,
-          color: '#f2f2f2',
-        },
-        ticks: {
-          beginAtZero: true,
-          stepSize: 1500,
-          callback: function(value, index, values) {
-            return '$' + value;
-          }
-        }
-      }],
-      xAxes: [{
-        gridLines: {
-          display: false,
-          tickMarkLength: 15,
-        }
-      }]
-    },
+// Función para realizar una solicitud GET a la API
+async function fetchData(url) {
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return null;
   }
+}
+
+// Función para obtener todos los campus desde la API
+async function getAllCampuses() {
+  const url = 'http://localhost:1234/campuses';
+  return await fetchData(url);
+}
+
+// Función para obtener un campus por su ID desde la API
+async function getCampusById(id) {
+  const url = `http://localhost:1234/campuses/${id}`;
+  return await fetchData(url);
+}
+
+// Función para crear un campus a través de la API
+async function createCampus(campusData) {
+  const url = 'http://localhost:1234/campuses';
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(campusData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Error creating campus');
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error creating campus:', error);
+    return false;
+  }
+}
+
+// Función para actualizar un campus por su ID a través de la API
+async function updateCampusById(id, campusData) {
+  const url = `http://localhost:1234/campuses/${id}`;
+  try {
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(campusData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Error updating campus');
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error updating campus:', error);
+    return false;
+  }
+}
+
+// Función para eliminar un campus por su ID a través de la API
+async function deleteCampusById(id) {
+  const url = `http://localhost:1234/campuses/${id}`;
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error('Error deleting campus');
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error deleting campus:', error);
+    return false;
+  }
+}
+
+// Función para cargar y mostrar la tabla de campus
+async function loadCampusTable() {
+  try {
+    const response = await getAllCampuses();
+
+    // Verificar que la respuesta no sea null y tenga una propiedad 'body' que sea un array
+    if (response && Array.isArray(response.body)) {
+      const campuses = response.body;
+      const tableBody = document.querySelector('#campus-table tbody');
+
+      // Limpiar la tabla existente
+      tableBody.innerHTML = '';
+
+      // Llenar la tabla con datos de la API
+campuses.forEach(campus => {
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td>${campus.CampusName}</td>
+    <td>
+      <button class="btn btn-primary btn-sm" onclick="editCampus(${campus.ID})">Editar</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteCampus(${campus.ID})">Eliminar</button>
+    </td>
+  `;
+  tableBody.appendChild(row);
 });
 
-var balance_chart = document.getElementById("balance-chart").getContext('2d');
+    } else {
+      console.error('La respuesta de la API no es un array válido:', response);
+    }
+  } catch (error) {
+    console.error('Error al cargar la tabla de campus:', error);
+  }
+}
 
-var balance_chart_bg_color = balance_chart.createLinearGradient(0, 0, 0, 70);
-balance_chart_bg_color.addColorStop(0, 'rgba(63,82,227,.2)');
-balance_chart_bg_color.addColorStop(1, 'rgba(63,82,227,0)');
 
-var myChart = new Chart(balance_chart, {
-  type: 'line',
-  data: {
-    labels: ['16-07-2018', '17-07-2018', '18-07-2018', '19-07-2018', '20-07-2018', '21-07-2018', '22-07-2018', '23-07-2018', '24-07-2018', '25-07-2018', '26-07-2018', '27-07-2018', '28-07-2018', '29-07-2018', '30-07-2018', '31-07-2018'],
-    datasets: [{
-      label: 'Balance',
-      data: [50, 61, 80, 50, 72, 52, 60, 41, 30, 45, 70, 40, 93, 63, 50, 62],
-      backgroundColor: balance_chart_bg_color,
-      borderWidth: 3,
-      borderColor: 'rgba(63,82,227,1)',
-      pointBorderWidth: 0,
-      pointBorderColor: 'transparent',
-      pointRadius: 3,
-      pointBackgroundColor: 'transparent',
-      pointHoverBackgroundColor: 'rgba(63,82,227,1)',
-    }]
-  },
-  options: {
-    layout: {
-      padding: {
-        bottom: -1,
-        left: -1
+// Función para manejar la acción de edición de un campus
+async function editCampus(id) {
+  // Obtener los datos del campus por su ID
+  const campus = await getCampusById(id);
+
+  // Verificar si se obtuvieron datos
+  if (campus) {
+    // Llenar un formulario con los datos del campus para la edición
+    const campusName = prompt('Editar nombre del campus:', campus.CampusName);
+    if (campusName !== null) {
+      const updatedCampusData = { CampusName: campusName };
+      const success = await updateCampusById(id, updatedCampusData);
+
+      if (success) {
+        alert('Campus actualizado con éxito');
+        // Volver a cargar la tabla de campus
+        loadCampusTable();
+      } else {
+        alert('Error al actualizar el campus');
       }
-    },
-    legend: {
-      display: false
-    },
-    scales: {
-      yAxes: [{
-        gridLines: {
-          display: false,
-          drawBorder: false,
-        },
-        ticks: {
-          beginAtZero: true,
-          display: false
-        }
-      }],
-      xAxes: [{
-        gridLines: {
-          drawBorder: false,
-          display: false,
-        },
-        ticks: {
-          display: false
-        }
-      }]
-    },
-  }
-});
-
-var sales_chart = document.getElementById("sales-chart").getContext('2d');
-
-var sales_chart_bg_color = sales_chart.createLinearGradient(0, 0, 0, 80);
-balance_chart_bg_color.addColorStop(0, 'rgba(63,82,227,.2)');
-balance_chart_bg_color.addColorStop(1, 'rgba(63,82,227,0)');
-
-var myChart = new Chart(sales_chart, {
-  type: 'line',
-  data: {
-    labels: ['16-07-2018', '17-07-2018', '18-07-2018', '19-07-2018', '20-07-2018', '21-07-2018', '22-07-2018', '23-07-2018', '24-07-2018', '25-07-2018', '26-07-2018', '27-07-2018', '28-07-2018', '29-07-2018', '30-07-2018', '31-07-2018'],
-    datasets: [{
-      label: 'Sales',
-      data: [70, 62, 44, 40, 21, 63, 82, 52, 50, 31, 70, 50, 91, 63, 51, 60],
-      borderWidth: 2,
-      backgroundColor: balance_chart_bg_color,
-      borderWidth: 3,
-      borderColor: 'rgba(63,82,227,1)',
-      pointBorderWidth: 0,
-      pointBorderColor: 'transparent',
-      pointRadius: 3,
-      pointBackgroundColor: 'transparent',
-      pointHoverBackgroundColor: 'rgba(63,82,227,1)',
-    }]
-  },
-  options: {
-    layout: {
-      padding: {
-        bottom: -1,
-        left: -1
-      }
-    },
-    legend: {
-      display: false
-    },
-    scales: {
-      yAxes: [{
-        gridLines: {
-          display: false,
-          drawBorder: false,
-        },
-        ticks: {
-          beginAtZero: true,
-          display: false
-        }
-      }],
-      xAxes: [{
-        gridLines: {
-          drawBorder: false,
-          display: false,
-        },
-        ticks: {
-          display: false
-        }
-      }]
-    },
-  }
-});
-
-$("#products-carousel").owlCarousel({
-  items: 3,
-  margin: 10,
-  autoplay: true,
-  autoplayTimeout: 5000,
-  loop: true,
-  responsive: {
-    0: {
-      items: 2
-    },
-    768: {
-      items: 2
-    },
-    1200: {
-      items: 3
     }
   }
+}
+
+// Función para manejar la acción de eliminación de un campus
+async function deleteCampus(id) {
+  const confirmDelete = confirm('¿Estás seguro de que deseas eliminar este campus?');
+
+  if (confirmDelete) {
+    const success = await deleteCampusById(id);
+
+    if (success) {
+      alert('Campus eliminado con éxito');
+      // Volver a cargar la tabla de campus
+      loadCampusTable();
+    } else {
+      alert('Error al eliminar el campus');
+    }
+  }
+}
+
+// Cargar la tabla de campus al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+  loadCampusTable();
 });

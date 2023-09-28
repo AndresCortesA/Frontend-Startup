@@ -154,7 +154,7 @@ function watching() {
     server:{
       baseDir: "./"
     },
-    startPath: 'pages/index.html',
+    startPath: 'pages/auth-login.html',
     port: 8080
   });
 

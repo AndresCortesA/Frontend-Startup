@@ -4,16 +4,16 @@
 {% extends 'layouts/master.html' %}
 
 {% block plugins_css %}
-  <link rel="stylesheet" href="../node_modules/bootstrap-social/bootstrap-social.css">
+  <link rel="stylesheet" href="../assets/css/custom.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
 {% endblock %}
-
 {% block content_2 %}
     <section class="section">
       <div class="container mt-5">
         <div class="row">
           <div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4">
             <div class="login-brand">
-              <img src="../../assets/img/logoUV_Oficial_Rojo.jpg" alt="logo" width="100" class="shadow-light">
+              <img src="../assets/img/logoUV_Oficial_Rojo.jpg" alt="logo" width="100" class="shadow-light">
             </div>
 
             <div class="card card-primary">
@@ -34,7 +34,7 @@
                     	<label for="password" class="control-label">Contraseña</label>
                       <div class="float-right">
                         <a href="auth-forgot-password.html" class="text-small">
-                          ¿Olvido su contraseña?
+                          ¿Olvidaste tu contraseña?
                         </a>
                       </div>
                     </div>
@@ -47,10 +47,16 @@
                   <div class="form-group">
                     <div class="custom-control custom-checkbox">
                       <input type="checkbox" name="remember" class="custom-control-input" tabindex="3" id="remember-me">
-                      <label class="custom-control-label" for="remember-me">Recordar</label>
+                      <label class="custom-control-label" for="remember-me">Recordarme</label>
                     </div>
-                  </div> 
+                  </div>
 
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block" tabindex="4">
+                      Iniciar sesion
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
             <div class="mt-5 text-muted text-center">
@@ -63,6 +69,11 @@
         </div>
       </div>
     </section>
+{% endblock %}
+
+{% block plugins_js %}
+  <script src="../node_modules/jquery-pwstrength/jquery.pwstrength.min.js"></script>
+  <script src="../node_modules/selectric/public/jquery.selectric.min.js"></script>
 {% endblock %}
 
 {% block page_js %}
